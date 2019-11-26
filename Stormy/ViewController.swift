@@ -5,7 +5,7 @@
 //  Created by Pasan Premaratne on 5/8/18.
 //  Copyright © 2018 Treehouse. All rights reserved.
 //
-
+// TODO: Implement Error Handling code, No Network connection, location is not correct, fails after refresh
 import UIKit
 
 class ViewController: UIViewController {
@@ -22,12 +22,8 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        client.getCurrentWeather(at: Coordinate.alcatrazIsland) { [unowned self] currentWeather, error in
-            if let currentWeather = currentWeather {
-                let viewModel = CurrentWeatherViewModel(model: currentWeather)
-                self.displayWeather(using: viewModel)
-            }
-        }
+        getCurrentWeather()
+        
     }
     
     func displayWeather(using viewModel: CurrentWeatherViewModel){
@@ -37,6 +33,26 @@ class ViewController: UIViewController {
         currentSummaryLabel.text = viewModel.summary
         currentWeatherIcon.image = viewModel.icon
         
+    }
+    
+    @IBAction func getCurrentWeather() {
+        toggleRefreshAnimation(on: true)
+        client.getCurrentWeather(at: Coordinate.alcatrazIsland) { [unowned self] currentWeather, error in
+            if let currentWeather = currentWeather {
+                let viewModel = CurrentWeatherViewModel(model: currentWeather)
+                self.displayWeather(using: viewModel)
+                self.toggleRefreshAnimation(on: false)
+            }
+        }
+    }
+    
+    func toggleRefreshAnimation(on: Bool){
+        refreshButton.isHidden = on
+        if on {
+            activityIndicator.startAnimating()
+        }else {
+            activityIndicator.stopAnimating()
+        }
     }
 }
 
